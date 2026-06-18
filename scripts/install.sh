@@ -1,23 +1,29 @@
 #!/usr/bin/env bash
-# Install the Evovi skills into Claude Code.
-#   ./scripts/install.sh             # global  -> ~/.claude/skills
-#   ./scripts/install.sh --project   # project -> ./.claude/skills
+# Cài Evovi agent skills cho Claude Code và/hoặc Codex.
+#   ./scripts/install.sh            # cả hai: ~/.claude/skills + ~/.agents/skills
+#   ./scripts/install.sh --claude   # chỉ Claude Code (~/.claude/skills)
+#   ./scripts/install.sh --codex    # chỉ Codex      (~/.agents/skills)
+#   ./scripts/install.sh --project  # theo dự án:    ./.claude/skills + ./.agents/skills
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SKILLS=(senior-engineer ship)
 
-if [[ "${1:-}" == "--project" ]]; then
-  DEST="$(pwd)/.claude/skills"
-else
-  DEST="$HOME/.claude/skills"
-fi
+case "${1:-}" in
+  --claude)  dests=("$HOME/.claude/skills") ;;
+  --codex)   dests=("$HOME/.agents/skills") ;;
+  --project) dests=("$(pwd)/.claude/skills" "$(pwd)/.agents/skills") ;;
+  "")        dests=("$HOME/.claude/skills" "$HOME/.agents/skills") ;;
+  *) echo "Tham số không hợp lệ: $1"; exit 1 ;;
+esac
 
-mkdir -p "$DEST"
-for s in "${SKILLS[@]}"; do
-  rm -rf "${DEST:?}/$s"
-  cp -R "$REPO_DIR/skills/$s" "$DEST/$s"
-  echo "installed $s -> $DEST/$s"
+for dest in "${dests[@]}"; do
+  mkdir -p "$dest"
+  for s in "${SKILLS[@]}"; do
+    rm -rf "${dest:?}/$s"
+    cp -R "$REPO_DIR/skills/$s" "$dest/$s"
+    echo "đã cài $s -> $dest/$s"
+  done
 done
 
-echo "Done. Restart Claude Code and run /help to confirm."
+echo "Xong. Khởi động lại agent, rồi /help (Claude Code) hoặc /skills (Codex) để kiểm tra."

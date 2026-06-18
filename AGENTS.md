@@ -14,9 +14,10 @@ template, mô tả PR, commit message ở phần diễn giải, trao đổi vớ
 bằng tiếng Việt.
 
 **Ngoại lệ:** các file `skills/*/SKILL.md` giữ nguyên tiếng Anh — đây là phần *chỉ dẫn chức
-năng* cho Claude Code và được kích hoạt bằng các cụm tiếng Anh (ví dụ `/ship`, "act as a
-senior engineer"). Dịch chúng sẽ làm hỏng cơ chế kích hoạt skill. Thuật ngữ kỹ thuật phổ biến
-(branch, commit, PR, deploy, skill...) có thể giữ nguyên tiếng Anh khi viết tài liệu tiếng Việt.
+năng* cho agent (Claude Code và Codex) và được kích hoạt bằng các cụm tiếng Anh (ví dụ
+`/ship`, "act as a senior engineer"). Dịch chúng sẽ làm hỏng cơ chế kích hoạt skill. Thuật ngữ
+kỹ thuật phổ biến (branch, commit, PR, deploy, skill...) có thể giữ nguyên tiếng Anh khi viết
+tài liệu tiếng Việt.
 
 ## Quy ước ship (cho repo này)
 

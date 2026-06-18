@@ -1,29 +1,48 @@
-# Hướng dẫn sử dụng Evovi Skills
+# Hướng dẫn sử dụng Evovi Agent Skills
 
-Cài đặt và sử dụng hai skill [Claude Code](https://claude.com/claude-code) trong repo này:
-**`senior-engineer`** và **`ship`**. Chỉ dùng nội bộ Evovi — xem [README](../README.md).
+Cài đặt và sử dụng hai agent skill trong repo này: **`senior-engineer`** và **`ship`**. Tương
+thích với [Claude Code](https://claude.com/claude-code) và [Codex](https://developers.openai.com/codex)
+(cùng chuẩn `SKILL.md`). Chỉ dùng nội bộ Evovi — xem [README](../README.md).
 
 | Skill | Chức năng |
 |---|---|
-| **`senior-engineer`** | Persona kỹ sư cấp cao + bộ định tuyến. Định hình cách Claude tư duy về kỹ thuật, cân nhắc khả năng mở rộng trong mọi quyết định backend/DB/schema, và định tuyến tới các skill chuyên biệt (review code, audit, refactor toàn app, khám phá sâu, plan→build). |
+| **`senior-engineer`** | Persona kỹ sư cấp cao + bộ định tuyến. Định hình cách agent tư duy về kỹ thuật, cân nhắc khả năng mở rộng trong mọi quyết định backend/DB/schema, và định tuyến tới các skill chuyên biệt (review code, audit, refactor toàn app, khám phá sâu, plan→build). |
 | **`ship`** | Pipeline một lệnh: branch → commit → push → PR, kèm tùy chọn merge + deploy. Đọc `AGENTS.md` của từng repo, cắt nhánh mới từ `develop`/`staging`, không động vào `main`. |
 
 ## Cài đặt
 
-Toàn cục (cho từng kỹ sư):
+Dùng script (cài cho Claude Code và/hoặc Codex):
 
 ```bash
 git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
-mkdir -p ~/.claude/skills && cp -R skills/senior-engineer skills/ship ~/.claude/skills/
+./scripts/install.sh             # cả hai: ~/.claude/skills + ~/.agents/skills
+./scripts/install.sh --claude    # chỉ Claude Code
+./scripts/install.sh --codex     # chỉ Codex
+./scripts/install.sh --project   # theo dự án
 ```
 
-Theo dự án (repo dùng chung) — copy vào `.claude/skills/` rồi commit:
+Hoặc copy thủ công — cả hai agent đều đọc chuẩn `SKILL.md`, chỉ khác đường dẫn:
 
 ```bash
-mkdir -p .claude/skills && cp -R /path/to/evo-artifact/skills/* .claude/skills/
+cp -R skills/senior-engineer skills/ship ~/.claude/skills/   # Claude Code
+cp -R skills/senior-engineer skills/ship ~/.agents/skills/   # Codex
 ```
 
-Kiểm tra: khởi động lại Claude Code, chạy `/help` và xác nhận cả hai skill được liệt kê.
+Kiểm tra: khởi động lại agent, rồi `/help` (Claude Code) hoặc `/skills` (Codex) để xác nhận
+cả hai skill được liệt kê.
+
+### Tích hợp vào Codex
+
+Codex dùng cùng định dạng skill dạng thư mục `SKILL.md`, đặt tại `~/.agents/skills/` (toàn cục)
+hoặc `.agents/skills/` (theo dự án). Sau khi cài, gọi skill bằng `/skills` hoặc nhắc tên skill.
+Codex cũng tự đọc `AGENTS.md`, nên quy ước ship hoạt động ngay.
+
+Nếu bạn đang chuyển từ Claude Code sang Codex, có thể dùng công cụ migration sẵn có của Codex:
+
+```bash
+codex --skill migrate-to-codex -- --scan-only   # quét cấu hình/skill Claude Code
+codex --skill migrate-to-codex -- --plan        # xem kế hoạch import
+```
 
 ## `senior-engineer`
 
@@ -73,7 +92,7 @@ dokploy ngay từ lần chạy đầu.
 
 ## Cập nhật & xử lý sự cố
 
-- **Cập nhật:** `git pull`, sau đó copy lại các thư mục `skills/*`.
-- **Không thấy trong `/help`:** kiểm tra đường dẫn là `~/.claude/skills/<name>/SKILL.md` rồi khởi động lại.
+- **Cập nhật:** `git pull`, sau đó chạy lại `./scripts/install.sh`.
+- **Không thấy trong danh sách skill:** kiểm tra đường dẫn `~/.claude/skills/<name>/SKILL.md` (Claude Code) hoặc `~/.agents/skills/<name>/SKILL.md` (Codex) rồi khởi động lại.
 - **`/ship` không mở được PR:** chạy `gh auth login`.
 - **Sai nhánh base của PR:** thêm mục shipping vào `AGENTS.md` hoặc dùng `/ship to <branch>`.

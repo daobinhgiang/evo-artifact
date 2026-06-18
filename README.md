@@ -1,6 +1,7 @@
-# Evovi Skills
+# Evovi Agent Skills
 
-Các skill [Claude Code](https://claude.com/claude-code) dành cho kỹ sư của Evovi.
+Agent skills cho kỹ sư Evovi — tương thích với [Claude Code](https://claude.com/claude-code)
+và [Codex](https://developers.openai.com/codex) (cùng chuẩn `SKILL.md`).
 
 > **Chỉ dùng nội bộ.** Các skill này mã hóa quy ước kỹ thuật của Evovi và chỉ dành cho nhân
 > sự Evovi sử dụng trong các dự án của Evovi. Không phân phối ra bên ngoài.
@@ -19,16 +20,18 @@ Các skill [Claude Code](https://claude.com/claude-code) dành cho kỹ sư củ
 
 ```bash
 git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
-./scripts/install.sh             # toàn cục  -> ~/.claude/skills
-./scripts/install.sh --project   # theo dự án -> ./.claude/skills
+./scripts/install.sh             # cả hai: ~/.claude/skills + ~/.agents/skills
+./scripts/install.sh --claude    # chỉ Claude Code
+./scripts/install.sh --codex     # chỉ Codex
+./scripts/install.sh --project   # theo dự án: ./.claude/skills + ./.agents/skills
 ```
 
-Khởi động lại Claude Code, chạy `/help` và xác nhận cả hai skill xuất hiện. Bảo trì skill?
-Xem [CONTRIBUTING.md](CONTRIBUTING.md).
+Khởi động lại agent, rồi `/help` (Claude Code) hoặc `/skills` (Codex) để xác nhận. Bảo trì
+skill? Xem [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Tài liệu
 
-**→ [Hướng dẫn sử dụng đầy đủ](docs/USAGE.md)** — các cách cài đặt, điều kiện kích hoạt, tất cả chế độ của `/ship` và xử lý sự cố.
+**→ [Hướng dẫn sử dụng đầy đủ](docs/USAGE.md)** — cài đặt cho Claude Code & Codex, điều kiện kích hoạt, tất cả chế độ của `/ship` và xử lý sự cố.
 
 Với các repo của Evovi, thả [`templates/AGENTS.evovi.md`](templates/AGENTS.evovi.md) vào dự án
 dưới tên `AGENTS.md` để `/ship` tự động theo luồng `develop` + deploy dokploy.
@@ -41,4 +44,5 @@ skills/
   ship/SKILL.md              # pipeline ship
 docs/USAGE.md                # hướng dẫn sử dụng
 templates/AGENTS.evovi.md    # AGENTS.md mẫu cho repo Evovi
+scripts/install.sh           # cài cho Claude Code và/hoặc Codex
 ```

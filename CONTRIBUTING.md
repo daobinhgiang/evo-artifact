@@ -1,6 +1,6 @@
 # Đóng góp
 
-Dành cho kỹ sư Evovi bảo trì các skill này.
+Dành cho kỹ sư Evovi bảo trì các agent skill này.
 
 ## Quy trình
 
@@ -12,9 +12,9 @@ Dành cho kỹ sư Evovi bảo trì các skill này.
 
 - Sửa `skills/<name>/SKILL.md`. Giữ nguyên phần frontmatter YAML.
 - **Tăng `version:`** mỗi khi thay đổi hành vi (theo semver).
-- Cập nhật `evals/evals.json` khi thay đổi điều kiện kích hoạt hoặc hành vi.
 - Giữ `description:` chính xác — đây là yếu tố quyết định khi nào skill được kích hoạt.
 - Giữ nguyên tiếng Anh cho `SKILL.md` (xem [AGENTS.md](AGENTS.md)) — chúng kích hoạt bằng cụm tiếng Anh.
+- Cùng một `SKILL.md` chạy cho cả Claude Code (`~/.claude/skills`) và Codex (`~/.agents/skills`) — đừng dùng tính năng riêng của một agent.
 
 ## Tài liệu
 
