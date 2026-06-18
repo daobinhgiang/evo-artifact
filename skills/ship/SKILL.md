@@ -48,7 +48,7 @@ Shipping means *committing* the changes that already exist — it never means *r
 
 ## Arguments
 
-- **No arguments (default)**: Ship ALL changes in the working tree — everything staged, unstaged, and untracked — **autonomously, with no approval prompts**. Read AGENTS.md and inspect branches, cut a new branch off the secondary branch, auto-generate the commit message, commit, push the new branch, open a PR into the secondary branch, and stop there (do **not** merge). Only pause for a suspected secret, a rejected push, or a blocking conflict.
+- **No arguments (default)**: Ship ALL changes in the working tree — everything staged, unstaged, and untracked — **autonomously, with no approval prompts**. Read AGENTS.md and inspect branches, cut a new branch off the secondary branch, auto-generate the commit message, commit, push the new branch, open a PR into the secondary branch, and stop there (do **not** merge). Only pause for a suspected secret, a rejected push, or a blocking conflict. **Exception — auto-continue:** if you're already on a non-primary/non-secondary branch that has an open PR, the default updates that branch/PR instead of cutting a new one (see Step 1.5), so re-running `/ship` after tweaking shipped work lands on the same PR.
 - **`to <branch>`**: PR into the named branch instead of the auto-resolved secondary branch — "ship to staging" bases the PR on `staging`. The new branch is still cut and pushed; only the PR base changes. The named branch must already exist.
 - **`from where I am` / `from here` / `from this branch`**: Skip cutting a new branch — ship the branch you're **currently on** as the PR head: commit, push it, and PR it into the secondary branch as-is. This is the escape hatch for continuing work on an existing branch instead of spawning a fresh one. (No effect if you're on the primary branch — never ship `main`/`master` as a head; fall back to cutting a new branch.)
 - **`this chat` / `this session` / `here`**: Ship ONLY the files touched during this Claude Code session. Ignore other uncommitted changes in the working tree. Examples: `/ship this chat`, `/ship this session`, `/ship here`.
@@ -132,6 +132,7 @@ Apply the **Branch model** (filtered through any AGENTS.md override from Step 0)
 
 **Now choose the head branch:**
 
+- **Auto-continue an existing ship branch (check this FIRST).** If you're currently on a branch that is **neither** the primary **nor** the secondary branch **and** that branch already has an open PR (from the `gh pr list` output in Step 0, match `headRefName` to the current branch), the user is almost certainly iterating on work they already shipped — so **treat this run as `from here`**: keep the current branch as the head, don't cut a new one. This is what makes "ship → tweak → ship again" land on the **same branch and same PR** instead of spawning a duplicate. State it in one line: "Continuing existing branch `ship/foo` (open PR #18) — updating it rather than cutting a new branch." (If the user explicitly passed a mode that cuts a new branch, or there's no open PR for the current branch, fall through to the default below.)
 - **Default → cut a new branch.** Branch off the up-to-date secondary branch so the PR diff is clean:
   ```bash
   git fetch origin
