@@ -1,0 +1,117 @@
+{
+  "skill_name": "senior-engineer",
+  "note": "Router/dispatcher skill. These evals test routing accuracy: does each kind of prompt cause the skill to invoke the correct downstream feature (Skill call), stay in-persona, or correctly NOT route? Runs are routing-decision-only: the runner makes its dispatch decision, confirms the target loads, then halts and reports which feature it routed to and why.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "route-deep-exploration-first",
+      "prompt": "Act as a senior engineer on this repo. I want to add a brand-new question type to the books, but first I need to actually understand how a book's per-book JSON gets turned into what the website renders — the whole content pipeline end to end. Walk me through how it works and where a new question type would have to plug in.",
+      "expected_output": "Routes to deep-exploration FIRST as the opening move (before any solo Bash/Glob/Read skim).",
+      "assertions": [
+        {"text": "Invokes Skill(deep-exploration) as the first tool action", "type": "routing"},
+        {"text": "Does not do a solo git log / ls / grep skim before handing off", "type": "behavior"}
+      ],
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "route-code-quality-review",
+      "prompt": "Senior-eng review please — I just finished this payments refactor on the current branch (about 4 files changed in src/services/billing/). Is it any good? Any code smells or things you'd push back on before I open a PR?",
+      "expected_output": "Routes a bounded diff/file review to code-quality-review.",
+      "assertions": [
+        {"text": "Invokes Skill(code-quality-review)", "type": "routing"},
+        {"text": "Does NOT invoke codebase-review (this is a bounded diff, not a whole-repo audit)", "type": "routing-negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "route-codebase-review",
+      "prompt": "We're about to take on two new engineers and I want a senior-level read on the whole project before they start. Can you audit the entire codebase — architecture, where the risk is, what's going to bite us — and give me a prioritized health check?",
+      "expected_output": "Routes a whole-system audit to codebase-review.",
+      "assertions": [
+        {"text": "Invokes Skill(codebase-review)", "type": "routing"},
+        {"text": "Does NOT route to code-quality-review (that's the bounded single-diff skill)", "type": "routing-negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "route-codebase-wide-change",
+      "prompt": "As a senior engineer: we renamed the concept 'workbook' to 'book' a while ago but the code is still littered with the old name — variables, types, file names, API routes, docs, all of it. I want it changed everywhere consistently with nothing missed. How do you want to tackle this?",
+      "expected_output": "Routes an across-the-app rename/refactor to codebase-wide-change.",
+      "assertions": [
+        {"text": "Invokes Skill(codebase-wide-change)", "type": "routing"},
+        {"text": "Does NOT treat this as a single-file edit or a code review", "type": "routing-negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "route-codex-triage",
+      "prompt": "Codex left a bunch of review comments on my PR overnight. Can you go through what it flagged and tell me which ones are actually worth fixing vs noise?",
+      "expected_output": "Routes PR-bot review triage to codex-triage.",
+      "assertions": [
+        {"text": "Invokes Skill(codex-triage)", "type": "routing"},
+        {"text": "Does NOT route to code-quality-review or native /code-review (this is triaging an existing bot review, not producing a new one)", "type": "routing-negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "route-parallel-execution",
+      "prompt": "Great, the plan looks good — let's build it. It's got the API endpoints, the React pages, and the seed script, which are mostly independent. Go ahead and implement the whole spec.",
+      "expected_output": "Routes 'execute the approved multi-part plan' to parallel-execution.",
+      "assertions": [
+        {"text": "Invokes Skill(parallel-execution)", "type": "routing"},
+        {"text": "Recognizes the planning→building transition rather than starting to hand-edit files solo", "type": "behavior"}
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "route-native-code-review-bugs",
+      "prompt": "Senior-eng, can you hunt for actual correctness bugs in the diff on this branch and leave them as inline review comments on the PR? I care about bugs that'll break in prod, not style.",
+      "expected_output": "Routes correctness-bug-hunting with PR comments to the native /code-review command, not the craftsmanship code-quality-review skill.",
+      "assertions": [
+        {"text": "Routes to the native /code-review command (with --comment)", "type": "routing"},
+        {"text": "Does NOT route to code-quality-review (that's craftsmanship, not a bug gate)", "type": "routing-negative"}
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "persona-backend-schema-ladder",
+      "prompt": "Senior-eng take, quick — don't go digging through the code. We're adding 'reading streaks' to the app: each user gets a daily streak count that we read on every app open and update once a day. How should I store this? Just a column on the users table, or something else?",
+      "expected_output": "Stays IN persona (no routing to a workflow skill) and answers with a scale-tiered options ladder, recommending the most effective/scalable tier rather than the easiest.",
+      "assertions": [
+        {"text": "Does NOT invoke a workflow skill (code-quality-review / codebase-review / etc.) — answers in persona", "type": "routing-negative"},
+        {"text": "Presents tiered scale options (e.g. good-enough / scales comfortably / scales aggressively) and makes a clear recommendation", "type": "behavior"},
+        {"text": "Honors the 'don't dig through the code' opt-out (no deep-exploration)", "type": "behavior"}
+      ],
+      "files": []
+    },
+    {
+      "id": 8,
+      "name": "negative-trivial-snippet",
+      "prompt": "Quick gut check as a senior engineer — does this look right?\n\n```python\ndef slugify(title):\n    return title.lower().replace(' ', '-')\n```",
+      "expected_output": "Answers directly in persona. Does NOT invoke deep-exploration or any workflow skill — it's a self-contained snippet.",
+      "assertions": [
+        {"text": "Does NOT invoke deep-exploration or any workflow skill", "type": "routing-negative"},
+        {"text": "Gives a direct, specific senior-engineer answer on the snippet", "type": "behavior"}
+      ],
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "negative-explicit-optout",
+      "prompt": "Senior-eng take, and please don't go digging through the codebase — I just want a quick opinion: is it fine to use a book's filename as its primary identifier/key, or is that asking for trouble down the line?",
+      "expected_output": "Honors the opt-out: does NOT invoke deep-exploration. Gives a direct senior-engineer opinion (tiered options / scale reasoning acceptable).",
+      "assertions": [
+        {"text": "Does NOT invoke deep-exploration (opt-out honored)", "type": "routing-negative"},
+        {"text": "Gives a direct opinion, ideally flagging the scale/maintainability risk of filename-as-key", "type": "behavior"}
+      ],
+      "files": []
+    }
+  ]
+}
