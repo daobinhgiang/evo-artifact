@@ -3,9 +3,6 @@
 Agent skills cho kỹ sư Evovi — tương thích với [Claude Code](https://claude.com/claude-code)
 và [Codex](https://developers.openai.com/codex) (cùng chuẩn `SKILL.md`).
 
-> **Chỉ dùng nội bộ.** Các skill này mã hóa quy ước kỹ thuật của Evovi và chỉ dành cho nhân
-> sự Evovi sử dụng trong các dự án của Evovi. Không phân phối ra bên ngoài.
-
 > Evovi là một công ty số hóa của Việt Nam — mọi tài liệu và giao tiếp đều bằng tiếng Việt.
 > Xem [AGENTS.md](AGENTS.md).
 
