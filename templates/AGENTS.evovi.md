@@ -1,27 +1,31 @@
 # AGENTS.md
 
-Drop this into an Evovi project repo as `AGENTS.md` so `/ship` follows Evovi conventions from
-the first run. Edit the placeholders to match the specific project.
+Thả file này vào một repo dự án của Evovi dưới tên `AGENTS.md` để `/ship` theo đúng quy ước
+Evovi ngay từ lần chạy đầu. Sửa các phần placeholder cho khớp với dự án cụ thể.
+
+## Ngôn ngữ
+
+Evovi là công ty số hóa của Việt Nam — mọi tài liệu, commit message (phần diễn giải) và giao
+tiếp đều bằng **tiếng Việt**.
 
 ## Shipping
 
-- **Primary branch:** `main` — protected, never committed/pushed/PR-targeted directly.
-- **Secondary branch:** `develop` — the integration target. All work arrives via PRs from
-  short-lived branches.
-- **Branch naming:** `feat/<slug>`, `fix/<slug>`, or `ship/<slug>`.
+- **Nhánh chính:** `main` — được bảo vệ, không commit/push/PR trực tiếp.
+- **Nhánh phụ:** `develop` — nhánh tích hợp. Mọi thay đổi vào qua PR từ nhánh ngắn hạn.
+- **Đặt tên nhánh:** `feat/<slug>`, `fix/<slug>`, hoặc `ship/<slug>`.
 - **PR base:** `develop`.
-- **Merge strategy:** squash.
+- **Chiến lược merge:** squash.
 
 ## Production Deploy
 
-Merging to `develop` deploys to the dokploy environment (`dokploy.test.evovi.vn`).
+Merge vào `develop` sẽ deploy lên môi trường dokploy (`dokploy.test.evovi.vn`).
 
-### Migrations
+### Migration
 ```bash
-# <project migration command, e.g. npm run migrate>
+# <lệnh migration của dự án, ví dụ npm run migrate>
 ```
 
-### Verify
+### Kiểm tra
 ```bash
-# <health-check command or URL>
+# <lệnh hoặc URL health-check>
 ```

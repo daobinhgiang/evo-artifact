@@ -1,41 +1,44 @@
 # Evovi Skills
 
-[Claude Code](https://claude.com/claude-code) skills for Evovi engineers.
+Các skill [Claude Code](https://claude.com/claude-code) dành cho kỹ sư của Evovi.
 
-> **Internal use only.** These skills encode Evovi's engineering conventions and are intended
-> for use by Evovi staff on Evovi projects. Not for external distribution.
+> **Chỉ dùng nội bộ.** Các skill này mã hóa quy ước kỹ thuật của Evovi và chỉ dành cho nhân
+> sự Evovi sử dụng trong các dự án của Evovi. Không phân phối ra bên ngoài.
 
-## Skills
+> Evovi là một công ty số hóa của Việt Nam — mọi tài liệu và giao tiếp đều bằng tiếng Việt.
+> Xem [AGENTS.md](AGENTS.md).
 
-| Skill | Purpose |
+## Các skill
+
+| Skill | Mục đích |
 |---|---|
-| [`senior-engineer`](skills/senior-engineer/SKILL.md) | Senior-engineer persona + router. Weighs scalability on every backend/DB/schema decision and routes work to the right specialist skill. |
-| [`ship`](skills/ship/SKILL.md) | One-command pipeline: branch → commit → push → PR, with optional merge + deploy. Defaults to Evovi's `develop`-branch flow and never touches `main`. |
+| [`senior-engineer`](skills/senior-engineer/SKILL.md) | Persona kỹ sư cấp cao + bộ định tuyến. Cân nhắc khả năng mở rộng (scalability) trong mọi quyết định về backend/DB/schema và định tuyến công việc tới skill chuyên biệt phù hợp. |
+| [`ship`](skills/ship/SKILL.md) | Pipeline một lệnh: branch → commit → push → PR, kèm tùy chọn merge + deploy. Mặc định theo luồng nhánh `develop` của Evovi và không bao giờ động vào `main`. |
 
-## Quick start
+## Bắt đầu nhanh
 
 ```bash
 git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
-./scripts/install.sh             # global  -> ~/.claude/skills
-./scripts/install.sh --project   # project -> ./.claude/skills
+./scripts/install.sh             # toàn cục  -> ~/.claude/skills
+./scripts/install.sh --project   # theo dự án -> ./.claude/skills
 ```
 
-Restart Claude Code, run `/help`, and confirm both skills appear. Maintaining the skills?
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Khởi động lại Claude Code, chạy `/help` và xác nhận cả hai skill xuất hiện. Bảo trì skill?
+Xem [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Documentation
+## Tài liệu
 
-**→ [Full usage guide](docs/USAGE.md)** — install options, triggers, all `/ship` modes, and troubleshooting.
+**→ [Hướng dẫn sử dụng đầy đủ](docs/USAGE.md)** — các cách cài đặt, điều kiện kích hoạt, tất cả chế độ của `/ship` và xử lý sự cố.
 
-For Evovi repos, drop [`templates/AGENTS.evovi.md`](templates/AGENTS.evovi.md) into your
-project as `AGENTS.md` so `/ship` follows the `develop` + dokploy deploy flow automatically.
+Với các repo của Evovi, thả [`templates/AGENTS.evovi.md`](templates/AGENTS.evovi.md) vào dự án
+dưới tên `AGENTS.md` để `/ship` tự động theo luồng `develop` + deploy dokploy.
 
-## Layout
+## Cấu trúc
 
 ```
 skills/
-  senior-engineer/SKILL.md   # persona + router
-  ship/SKILL.md              # shipping pipeline
-docs/USAGE.md                # how to use the skills
-templates/AGENTS.evovi.md    # drop-in AGENTS.md for Evovi repos
+  senior-engineer/SKILL.md   # persona + bộ định tuyến
+  ship/SKILL.md              # pipeline ship
+docs/USAGE.md                # hướng dẫn sử dụng
+templates/AGENTS.evovi.md    # AGENTS.md mẫu cho repo Evovi
 ```
