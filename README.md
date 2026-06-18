@@ -16,10 +16,12 @@
 
 ```bash
 git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
-mkdir -p ~/.claude/skills && cp -R skills/senior-engineer skills/ship ~/.claude/skills/
+./scripts/install.sh             # global  -> ~/.claude/skills
+./scripts/install.sh --project   # project -> ./.claude/skills
 ```
 
-Restart Claude Code, run `/help`, and confirm both skills appear.
+Restart Claude Code, run `/help`, and confirm both skills appear. Maintaining the skills?
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Documentation
 

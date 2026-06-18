@@ -1,0 +1,26 @@
+name: validate-skills
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check each skill has a valid SKILL.md
+        run: |
+          set -e
+          fail=0
+          for dir in skills/*/; do
+            skill="${dir%/}"
+            md="$skill/SKILL.md"
+            if [[ ! -f "$md" ]]; then
+              echo "::error::$skill is missing SKILL.md"; fail=1; continue
+            fi
+            grep -q '^name:' "$md"        || { echo "::error::$md missing 'name:'"; fail=1; }
+            grep -q '^description:' "$md" || { echo "::error::$md missing 'description:'"; fail=1; }
+            grep -q '^version:' "$md"     || { echo "::error::$md missing 'version:'"; fail=1; }
+            echo "checked $md"
+          done
+          exit $fail
