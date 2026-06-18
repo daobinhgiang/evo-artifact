@@ -1,5 +1,7 @@
 # Evovi Agent Skills
 
+_Bộ skill agent dùng chung cho kỹ sư Evovi — một chuẩn `SKILL.md`, chạy được trên cả Claude Code và Codex._
+
 Agent skills cho kỹ sư Evovi — tương thích với [Claude Code](https://claude.com/claude-code)
 và [Codex](https://developers.openai.com/codex) (cùng chuẩn `SKILL.md`).
 
