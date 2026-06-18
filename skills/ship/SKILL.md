@@ -8,7 +8,7 @@ version: 5.0.0
 
 You are a shipping pipeline. Your job is to take whatever changes exist in the working tree, package them into a clean commit on a **new branch**, push that branch, and open a PR from it into the project's **secondary branch** — and optionally merge and deploy.
 
-**The default `/ship` runs autonomously — no approval prompts.** When the user types plain `/ship`, ship *everything* in the working tree end-to-end without stopping to ask "should I proceed?" The user already told you to ship; don't make them confirm again. The only things that pause the default flow are genuine safety issues: a possible secret in the diff (Step 1), a push that gets rejected, or a working-tree conflict that blocks the ship. Everything else just runs. (The post-ship review-monitor offer in Step 7 is fine — it comes *after* the PR exists, so it doesn't gate the ship.)
+**The default `/ship` runs autonomously — no approval prompts.** When the user types plain `/ship`, ship *everything* in the working tree end-to-end without stopping to ask "should I proceed?" The user already told you to ship; don't make them confirm again. The only things that pause the default flow are genuine safety issues: a possible secret in the diff (Step 1), a push that gets rejected, or a working-tree conflict that blocks the ship. Everything else just runs. (The post-ship review-monitor offer in Step 7 — which only happens when AGENTS.md declares an automated code reviewer — is fine: it comes *after* the PR exists, so it doesn't gate the ship.)
 
 ## Two principles that override everything below
 
@@ -322,11 +322,13 @@ Follow the instructions step by step. Run each command, check output, report res
 - **Check for relevance** — if the playbook mentions migrations but the diff touched none, note "No pending migrations" and skip.
 - **Report results clearly** — for each step, say what you ran and what happened.
 
-### Step 7: Suggest the review monitor (do NOT auto-create)
+### Step 7: Suggest the review monitor (only if an automated reviewer is configured)
 
 Skip if merge mode was used (the PR is already merged).
 
-After the PR is created, **ask the user** if they want a recurring review monitor. Do NOT create the cron automatically.
+**Gate — only offer the monitor when the repo has an automated code reviewer.** The monitor exists to surface bot review comments (Codex and similar); with no bot posting on PRs there's nothing for it to poll, so offering it is just noise. Only proceed with the offer if **AGENTS.md explicitly declares an automated code reviewer** — e.g. a `## Code review` / `## Automated review` section, or a line naming Codex / `chatgpt-codex-connector` / another PR-review bot. If AGENTS.md says nothing about an automated reviewer, **skip this step entirely — do NOT ask the user about a review monitor at all.** (Don't infer a reviewer from CI configs or guess; it must be stated in AGENTS.md.)
+
+When the gate passes, **ask the user** if they want a recurring review monitor. Do NOT create the cron automatically.
 
 > Want me to set up a review monitor? It polls for PR review comments every 5 minutes and summarizes feedback (including Codex inline suggestions). Auto-expires after 3 days.
 
@@ -413,7 +415,7 @@ Shipped:
 - Committed: "Fix auth waterfall..." (5 files)
 - Pushed and opened PR #18 (ship/auth-waterfall-fix → develop): https://github.com/...
 ```
-Then ask about the review monitor (Step 7).
+Then, **only if AGENTS.md declares an automated code reviewer**, ask about the review monitor (Step 7). Otherwise end here without mentioning the monitor.
 
 `no pr` mode:
 ```
