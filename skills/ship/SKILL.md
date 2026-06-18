@@ -253,6 +253,16 @@ After the merge succeeds, sync local and return to the secondary branch (your wo
 git checkout <secondary-branch> && git pull origin <secondary-branch>
 ```
 
+**Always clean up the short-lived head branch after a merge — don't rely on `--delete-branch` alone.** `gh pr merge --delete-branch` removes the branch only when *gh* performs the merge; if the merge already happened another way (you merged it manually, the user clicked merge in the UI, or a release flow merged it), the branch lingers. So after confirming the merge, explicitly sweep the head branch — remote first, then the stale local ref:
+
+```bash
+git push origin --delete <head-branch> 2>/dev/null || true   # no-op if --delete-branch already removed it
+git branch -D <head-branch> 2>/dev/null || true              # drop the local copy now that it's merged
+git fetch --prune origin                                      # clear stale remote-tracking refs
+```
+
+This applies **only** to the short-lived ship branch — **never** delete a long-lived branch (`develop`/`dev`/`staging`, a `from here` feature branch, or the primary branch). When in doubt, only delete a branch matching the name you cut in Step 1.5.
+
 If the merge fails (conflicts, required checks pending), report the error and leave the PR open. Don't retry. Then proceed to Step 6B. **When merge mode is active, skip Step 7.**
 
 ### Step 6B: Production deployment (only after successful merge)
