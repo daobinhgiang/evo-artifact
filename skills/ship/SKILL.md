@@ -1,7 +1,7 @@
 ---
 name: ship
 description: "One command to branch, commit, push, and open a PR — with optional merge and deploy. Triggers on /ship, 'ship it', 'commit and push', 'send this up', 'open a PR', 'push my changes', 'push this up'. Default: reads the project's conventions from AGENTS.md and inspects GitHub branches first, then creates a NEW branch off the repo's secondary branch (develop/feature/staging — main/master is primary and protected), commits ALL working-tree changes onto it, pushes it, and opens a PR into the secondary branch — autonomously. AGENTS.md shipping conventions ALWAYS override these defaults. If the user wants a different flow, adapt to it and offer to record it in AGENTS.md. '/ship no pr' commits and pushes the new branch but stops before opening the PR. '/ship this chat' / '/ship here' ships only this session's files. '/ship to <branch>' targets a specific base branch for the PR. '/ship from where I am' / 'from here' ships the current branch as-is instead of cutting a new one. '/ship merge' merges the PR into the secondary branch and runs the production deploy per AGENTS.md. '/ship review' runs a senior-engineer review on the shipped diff. Modes combine: '/ship here no pr'."
-version: 5.0.0
+version: 5.1.0
 ---
 
 # /ship — Branch, Commit, Push, PR, Deploy
@@ -185,6 +185,19 @@ EOF
 )"
 ```
 3. Run `git status` after to confirm the commit succeeded.
+
+### Step 3.5: Pull the latest base into the head branch before pushing
+
+The point is to build the PR on the **up-to-date base** so the diff is clean and the merge stays conflict-free.
+
+- **Freshly cut branch (default flow)**: Step 1.5 already rooted it on the up-to-date base via `git checkout -b <new-branch> origin/<secondary-branch>` (right after `git fetch origin`), so there's nothing to sync — **skip this step.**
+- **Existing branch (`from here`, auto-continue, or an AGENTS.md push-to-existing flow)**: that branch may be behind the base. Fetch and merge the latest base in before pushing:
+  ```bash
+  git fetch origin <secondary-branch>
+  git merge origin/<secondary-branch> -m "Merge <secondary-branch> into <head-branch>"
+  ```
+
+Use a **plain merge** (not rebase/reset) to honor the guardrail — it adds a merge commit rather than rewriting history. On a clean merge, continue to Step 4. On conflicts, do NOT discard or force past them: list the conflicting files, stop, and ask the user to resolve (or resolve them manually). Never `reset`/`checkout --`/`stash`/`clean`/force to make the merge "work."
 
 ### Step 4: Push the branch
 
