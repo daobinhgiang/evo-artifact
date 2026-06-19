@@ -1,12 +1,14 @@
 # Hướng dẫn sử dụng Evovi Agent Skills
 
-Cài đặt và sử dụng hai agent skill trong repo này: **`senior-engineer`** và **`ship`**. Tương
-thích với [Claude Code](https://claude.com/claude-code) và [Codex](https://developers.openai.com/codex)
+Cài đặt và sử dụng các agent skill trong repo này: **họ `senior-engineer`** (gồm `senior-engineer`
+và 6 skill chuyên biệt nó định tuyến tới) và **`ship`**. Tương thích với
+[Claude Code](https://claude.com/claude-code) và [Codex](https://developers.openai.com/codex)
 (cùng chuẩn `SKILL.md`). Chỉ dùng nội bộ Evovi — xem [README](../README.md).
 
 | Skill | Chức năng |
 |---|---|
 | **`senior-engineer`** | Persona kỹ sư cấp cao + bộ định tuyến. Định hình cách agent tư duy về kỹ thuật, cân nhắc khả năng mở rộng trong mọi quyết định backend/DB/schema, và định tuyến tới các skill chuyên biệt (review code, audit, refactor toàn app, khám phá sâu, plan→build). |
+| **Họ skill chuyên biệt** | `deep-exploration`, `parallel-execution`, `code-quality-review`, `codebase-review`, `codebase-wide-change`, `codex-triage` — các workflow mà `senior-engineer` định tuyến tới. Đi kèm và được cài cùng nhau. |
 | **`ship`** | Pipeline một lệnh: branch → commit → push → PR, kèm tùy chọn merge + deploy. Đọc `AGENTS.md` của từng repo, cắt nhánh mới từ `develop`/`staging`, không động vào `main`. |
 
 ## Cài đặt
@@ -24,8 +26,8 @@ git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
 Hoặc copy thủ công — cả hai agent đều đọc chuẩn `SKILL.md`, chỉ khác đường dẫn:
 
 ```bash
-cp -R skills/senior-engineer skills/ship ~/.claude/skills/   # Claude Code
-cp -R skills/senior-engineer skills/ship ~/.agents/skills/   # Codex
+cp -R skills/* ~/.claude/skills/   # Claude Code (cả họ senior-engineer + ship)
+cp -R skills/* ~/.agents/skills/   # Codex
 ```
 
 Kiểm tra: khởi động lại agent, rồi `/help` (Claude Code) hoặc `/skills` (Codex) để xác nhận
@@ -64,9 +66,51 @@ tới các skill chuyên biệt:
 | Hiểu code trước khi hành động | `deep-exploration` |
 | Phân loại comment review của Codex | `codex-triage` |
 
-> Các skill được định tuyến tới là **riêng biệt** và không đi kèm trong repo này.
-> `senior-engineer` vẫn hoạt động độc lập như một persona; cài thêm các skill kia để dùng đầy
-> đủ tính năng định tuyến.
+> Sáu skill được định tuyến tới **đi kèm trong repo này** và được `install.sh` cài cùng
+> `senior-engineer`. Vì `senior-engineer` là bộ định tuyến (nó gọi `Skill(...)` tới các skill
+> kia), thiếu chúng thì các lệnh định tuyến sẽ lỗi — nên hãy luôn cài cả họ cùng nhau.
+
+### (Tùy chọn) Tự động hóa plan mode bằng hook — *chỉ Claude Code*
+
+`senior-engineer` có một vòng đời **plan → persist → build**: khi lập kế hoạch nó khám phá
+codebase bằng `deep-exploration`, và sau khi bạn duyệt kế hoạch ("Implement the plan") nó lưu
+kế hoạch vào `.claude/plans/<slug>.md` rồi thực thi bằng `parallel-execution`. Cơ chế này hoạt
+động ở dạng *gợi ý* (instructions nằm trong context). Nếu muốn **đảm bảo chắc chắn**, repo có
+sẵn hai hook (Claude Code) tại [`skills/senior-engineer/hooks/`](../skills/senior-engineer/hooks/):
+
+- `plan_mode_prompt.py` — hook `UserPromptSubmit`: khi đang ở plan mode, nhắc agent dùng vòng
+  đời `senior-engineer` (chỉ với task code/feature thực sự — task nhỏ/không phải code thì bỏ qua).
+- `plan_approved.py` — hook `PostToolUse` khớp `ExitPlanMode`: kích hoạt **đúng lúc bạn duyệt
+  kế hoạch**, nhắc lưu kế hoạch vào `.claude/plans/` rồi chạy `parallel-execution` (chỉ với thay
+  đổi nhiều phần — thay đổi nhỏ thì build thẳng).
+
+Cả hai đều **judgment-preserving**: không bao giờ ép fan-out cho một thay đổi tầm thường. Để bật,
+thêm vào `~/.claude/settings.json` (đường dẫn theo bản cài mặc định của Claude Code):
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      { "hooks": [ { "type": "command", "command": "python3 ~/.claude/skills/senior-engineer/hooks/plan_mode_prompt.py", "timeout": 10 } ] }
+    ],
+    "PostToolUse": [
+      { "matcher": "ExitPlanMode", "hooks": [ { "type": "command", "command": "python3 ~/.claude/skills/senior-engineer/hooks/plan_approved.py", "timeout": 10 } ] }
+    ]
+  }
+}
+```
+
+> **Lưu ý — gộp, đừng ghi đè.** Nếu `settings.json` của bạn đã có khối `"hooks"` (ví dụ hook
+> âm thanh `Stop`/`Notification`), hãy **gộp** hai key `UserPromptSubmit` và `PostToolUse` ở trên
+> vào khối `hooks` hiện có — đừng dán đè cả khối, nếu không bạn sẽ xóa mất các hook đang có. Nếu
+> đã có sẵn `PostToolUse`, thêm một mục matcher `ExitPlanMode` vào mảng thay vì thay thế.
+
+> **Đường dẫn theo kiểu cài.** Snippet trên dùng đường dẫn của bản cài mặc định
+> (`~/.claude/skills/...`). Nếu bạn cài theo dự án (`./scripts/install.sh --project`), đổi thành
+> `./.claude/skills/senior-engineer/hooks/...`. Cần có `python3` trong PATH.
+
+Hook chỉ được nạp lúc khởi động — sau khi sửa `settings.json`, **khởi động lại Claude Code**
+(hoặc `/hooks`). Codex không dùng cơ chế hook này; với Codex chỉ có dạng *gợi ý* trong `SKILL.md`.
 
 ## `ship`
 
