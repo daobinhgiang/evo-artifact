@@ -14,7 +14,17 @@ và [Codex](https://developers.openai.com/codex) (cùng chuẩn `SKILL.md`).
 | Skill | Mục đích |
 |---|---|
 | [`senior-engineer`](skills/senior-engineer/SKILL.md) | Persona kỹ sư cấp cao + bộ định tuyến. Cân nhắc khả năng mở rộng (scalability) trong mọi quyết định về backend/DB/schema và định tuyến công việc tới skill chuyên biệt phù hợp. |
+| ↳ [`deep-exploration`](skills/deep-exploration/SKILL.md) | Khám phá codebase theo kiểu chia-để-trị bằng nhiều subagent `Explore` song song. Là engine đứng sau nhiều skill khác. |
+| ↳ [`parallel-execution`](skills/parallel-execution/SKILL.md) | Thực thi một kế hoạch đã duyệt bằng cách chia việc ra nhiều builder song song, kèm tester kiểm tra từng phần. |
+| ↳ [`code-quality-review`](skills/code-quality-review/SKILL.md) | Review chất lượng có giới hạn (một diff / PR / file / function): verdict + phân loại mức độ. Giữ bộ `references/` dùng chung. |
+| ↳ [`codebase-review`](skills/codebase-review/SKILL.md) | Audit toàn bộ codebase theo nhiều pha (explore → research → deep-dive → báo cáo). |
+| ↳ [`codebase-wide-change`](skills/codebase-wide-change/SKILL.md) | Áp một thay đổi nhất quán trên toàn repo, không bỏ sót file nào. |
+| ↳ [`codex-triage`](skills/codex-triage/SKILL.md) | Phân loại comment review tự động của Codex trên PR: Fix Now / Fix Later / Dismiss. |
 | [`ship`](skills/ship/SKILL.md) | Pipeline một lệnh: branch → commit → push → PR, kèm tùy chọn merge + deploy. Mặc định theo luồng nhánh `develop` của Evovi và không bao giờ động vào `main`. |
+
+> Sáu skill có dấu **↳** là *họ skill* mà `senior-engineer` định tuyến tới. `senior-engineer`
+> là bộ định tuyến — nếu thiếu chúng thì các lệnh `Skill(...)` của nó sẽ lỗi. Vì vậy hãy luôn
+> **cài cả họ cùng nhau** (`install.sh` đã làm sẵn việc này).
 
 ## Bắt đầu nhanh
 
@@ -40,9 +50,17 @@ dưới tên `AGENTS.md` để `/ship` tự động theo luồng `develop` + dep
 
 ```
 skills/
-  senior-engineer/SKILL.md   # persona + bộ định tuyến
-  ship/SKILL.md              # pipeline ship
-docs/USAGE.md                # hướng dẫn sử dụng
-templates/AGENTS.evovi.md    # AGENTS.md mẫu cho repo Evovi
-scripts/install.sh           # cài cho Claude Code và/hoặc Codex
+  senior-engineer/             # persona + bộ định tuyến
+    SKILL.md
+    hooks/                     # (tùy chọn, chỉ Claude Code) tự động hóa plan mode
+  deep-exploration/SKILL.md    # khám phá codebase song song (engine dùng chung)
+  parallel-execution/SKILL.md  # thực thi kế hoạch song song
+  code-quality-review/         # review chất lượng có giới hạn + references/ dùng chung
+  codebase-review/SKILL.md     # audit toàn bộ codebase
+  codebase-wide-change/SKILL.md # thay đổi nhất quán toàn repo
+  codex-triage/SKILL.md        # phân loại review của Codex
+  ship/SKILL.md                # pipeline ship
+docs/USAGE.md                  # hướng dẫn sử dụng
+templates/AGENTS.evovi.md      # AGENTS.md mẫu cho repo Evovi
+scripts/install.sh             # cài cho Claude Code và/hoặc Codex
 ```

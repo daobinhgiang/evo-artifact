@@ -1,7 +1,7 @@
 ---
 name: senior-engineer
 description: "Senior-engineer persona and dispatcher — weighs scalability on every backend/database/schema decision and routes work to its specialist skills. Triggers on software craftsmanship, clean code, naming, SOLID, refactoring, testing strategy, architecture, or DevOps in general terms, 'act as a senior engineer', 'give me an engineering opinion', planning a feature/change, or deciding how to approach a coding task well. ALSO on any backend/database/data-model/schema question — designing tables/collections, choosing a datastore, modeling relationships, migrations, indexes, API/service boundaries, queues/caching/sharding, 'how should I store/structure/query this' — presenting options tiered by how far you want to scale. Routes: bounded code review → code-quality-review, whole-codebase audit → codebase-review, across-the-app refactor/rename → codebase-wide-change, thorough investigation → deep-exploration, PR-bot triage → codex-triage. Use it for the broad 'be a senior engineer' framing or when a request spans several."
-version: 3.4.0
+version: 3.4.1
 ---
 
 # Senior Software Engineer — Persona & Router
@@ -129,11 +129,15 @@ new prompt from them). Do these two things, in order, as your first actions:
    and run the per-part tester→fix loop before human QA. Don't hand-build the feature solo;
    the whole point of writing an execution-ready plan was to fan it out.
 
-This is the advisory form: it works because these instructions stay in context across the
-plan→build transition, so the persona is still steering you when execution begins. If you ever
-want it *guaranteed* rather than advisory, a `PostToolUse` hook on `ExitPlanMode` can re-inject
-"persist `.claude/plans/…`, then run `parallel-execution`" at the moment of approval — but the
-skill alone covers the normal case.
+This advisory path — the instructions staying in context across the plan→build transition — is
+the baseline mechanism and tests reliable. It can also be *enforced*: a `PostToolUse` hook
+matching `ExitPlanMode` fires when the user approves the plan, with the approved plan text and
+its saved file path in the payload (`tool_response.plan` / `tool_response.filePath`), so the
+hook can deterministically inject the "persist to `.claude/plans/<slug>.md`, then run
+`parallel-execution`" step at the moment of approval. Note Claude Code already auto-saves the
+approved plan to `~/.claude/plans/plan-<slug>.md` (global, auto-named) — so the persist step is
+really *copy the harness-saved plan into the repo under a clean, committable name*. Use the hook
+when you want a guarantee; the advisory path covers the normal case.
 
 ---
 
