@@ -35,6 +35,23 @@ cp -R skills/* ~/.agents/skills/   # Codex
 Kiểm tra: khởi động lại agent, rồi `/help` (Claude Code) hoặc `/skills` (Codex) để xác nhận
 cả hai skill được liệt kê.
 
+### Cập nhật
+
+`install.sh` tự thêm lệnh `evovi-skills` vào `~/.local/bin` và ghi nhớ phạm vi bạn đã chọn
+(Claude / Codex / cả hai). Cập nhật về sau giống `npm update`:
+
+```bash
+evovi-skills update     # kéo bản mới nhất từ GitHub rồi cài lại đúng phạm vi đã chọn lần trước
+evovi-skills            # cài lại theo phạm vi đã chọn
+evovi-skills --claude   # đổi phạm vi rồi cài lại
+```
+
+Cơ chế: mỗi lần cài/cập nhật, script `rm -rf` thư mục skill cũ rồi copy bản mới, nên không bao
+giờ còn file thừa. Khi gọi qua `evovi-skills` (hoặc `curl | bash`), nó tự `git clone --depth 1`
+bản mới nhất vào thư mục tạm. Nếu báo `command not found`, thêm
+`export PATH="$HOME/.local/bin:$PATH"` vào `~/.zshrc` rồi mở lại terminal — hoặc chạy lại lệnh
+`curl ... | bash` trong README.
+
 ### Tích hợp vào Codex
 
 Codex dùng cùng định dạng skill dạng thư mục `SKILL.md`, đặt tại `~/.agents/skills/` (toàn cục)

@@ -3,9 +3,6 @@
 Agent skills cho kỹ sư Evovi — tương thích với [Claude Code](https://claude.com/claude-code)
 và [Codex](https://developers.openai.com/codex) (cùng chuẩn `SKILL.md`).
 
-> **Chỉ dùng nội bộ.** Các skill này mã hóa quy ước kỹ thuật của Evovi và chỉ dành cho nhân
-> sự Evovi sử dụng trong các dự án của Evovi. Không phân phối ra bên ngoài.
-
 > Evovi là một công ty số hóa của Việt Nam — mọi tài liệu và giao tiếp đều bằng tiếng Việt.
 > Xem [AGENTS.md](AGENTS.md).
 
@@ -57,6 +54,21 @@ muốn cấu hình thủ công.
 
 Khởi động lại agent, rồi `/help` (Claude Code) hoặc `/skills` (Codex) để xác nhận. Bảo trì
 skill? Xem [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Cập nhật
+
+Lần cài đầu tiên đã thêm lệnh `evovi-skills` vào PATH (tại `~/.local/bin`). Sau đó cập nhật
+giống `npm update` — một lệnh ngắn, tự kéo bản mới nhất rồi cài lại đúng phạm vi đã chọn:
+
+```bash
+evovi-skills update     # kéo bản mới nhất từ GitHub, cài lại (Claude / Codex / cả hai như lần trước)
+evovi-skills            # cài lại theo phạm vi đã chọn
+evovi-skills --codex    # đổi phạm vi rồi cài lại
+```
+
+> Nếu terminal báo `evovi-skills: command not found`, thêm `export PATH="$HOME/.local/bin:$PATH"`
+> vào `~/.zshrc` rồi mở lại terminal. Cách thay thế: chạy lại đúng lệnh `curl ... | bash` ở trên —
+> nó cũng ghi đè bằng bản mới nhất.
 
 ## Tài liệu
 
