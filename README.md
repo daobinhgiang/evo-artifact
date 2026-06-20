@@ -18,6 +18,7 @@ và [Codex](https://developers.openai.com/codex) (cùng chuẩn `SKILL.md`).
 | ↳ [`codebase-wide-change`](skills/codebase-wide-change/SKILL.md) | Áp một thay đổi nhất quán trên toàn repo, không bỏ sót file nào. |
 | ↳ [`codex-triage`](skills/codex-triage/SKILL.md) | Phân loại comment review tự động của Codex trên PR: Fix Now / Fix Later / Dismiss. |
 | [`ship`](skills/ship/SKILL.md) | Pipeline một lệnh: branch → commit → push → PR, kèm tùy chọn merge + deploy. Mặc định theo luồng nhánh `develop` của Evovi và không bao giờ động vào `main`. |
+| [`test`](skills/test/SKILL.md) | QA tính năng trên trình duyệt thật: chạy nhiều Playwright MCP server song song, mỗi flow một subagent. Enumerate ca kiểm thử vào `TEST_MATRIX.md`, fan-out kiểm thử đồng thời rồi tổng hợp báo cáo. Cần Playwright MCP — `install.sh --playwright` thiết lập sẵn. |
 
 > Sáu skill có dấu **↳** là *họ skill* mà `senior-engineer` định tuyến tới. `senior-engineer`
 > là bộ định tuyến — nếu thiếu chúng thì các lệnh `Skill(...)` của nó sẽ lỗi. Vì vậy hãy luôn
@@ -43,7 +44,13 @@ git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
 ./scripts/install.sh --claude    # chỉ Claude Code
 ./scripts/install.sh --codex     # chỉ Codex
 ./scripts/install.sh --project   # theo dự án: ./.claude/skills + ./.agents/skills
+./scripts/install.sh --playwright # cài skills + thêm Playwright MCP server cho /test (mặc định 5; --playwright=7 cho 7)
 ```
+
+Skill `/test` cần nhiều **Playwright MCP server isolated** chạy song song. Thêm `--playwright` (hoặc
+`--playwright=N`) để installer tự chạy `claude mcp add` cho `playwright`, `playwright2`, … (cần có
+`claude` CLI). Xem [`skills/test/references/mcp-setup.md`](skills/test/references/mcp-setup.md) nếu
+muốn cấu hình thủ công.
 
 Khởi động lại agent, rồi `/help` (Claude Code) hoặc `/skills` (Codex) để xác nhận. Bảo trì
 skill? Xem [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -84,6 +91,7 @@ skills/
   codebase-wide-change/SKILL.md # thay đổi nhất quán toàn repo
   codex-triage/SKILL.md        # phân loại review của Codex
   ship/SKILL.md                # pipeline ship
+  test/SKILL.md                # QA trình duyệt song song (Playwright MCP)
 docs/USAGE.md                  # hướng dẫn sử dụng
 templates/AGENTS.evovi.md      # AGENTS.md mẫu cho repo Evovi
 scripts/install.sh             # cài cho Claude Code và/hoặc Codex
