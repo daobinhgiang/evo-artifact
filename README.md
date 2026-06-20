@@ -48,6 +48,21 @@ git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
 Khởi động lại agent, rồi `/help` (Claude Code) hoặc `/skills` (Codex) để xác nhận. Bảo trì
 skill? Xem [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Cập nhật
+
+Lần cài đầu tiên đã thêm lệnh `evovi-skills` vào PATH (tại `~/.local/bin`). Sau đó cập nhật
+giống `npm update` — một lệnh ngắn, tự kéo bản mới nhất rồi cài lại đúng phạm vi đã chọn:
+
+```bash
+evovi-skills update     # kéo bản mới nhất từ GitHub, cài lại (Claude / Codex / cả hai như lần trước)
+evovi-skills            # cài lại theo phạm vi đã chọn
+evovi-skills --codex    # đổi phạm vi rồi cài lại
+```
+
+> Nếu terminal báo `evovi-skills: command not found`, thêm `export PATH="$HOME/.local/bin:$PATH"`
+> vào `~/.zshrc` rồi mở lại terminal. Cách thay thế: chạy lại đúng lệnh `curl ... | bash` ở trên —
+> nó cũng ghi đè bằng bản mới nhất.
+
 ## Tài liệu
 
 **→ [Hướng dẫn sử dụng đầy đủ](docs/USAGE.md)** — cài đặt cho Claude Code & Codex, điều kiện kích hoạt, tất cả chế độ của `/ship` và xử lý sự cố.
