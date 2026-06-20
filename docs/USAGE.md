@@ -76,23 +76,16 @@ tới các skill chuyên biệt:
 codebase bằng `deep-exploration`, và sau khi bạn duyệt kế hoạch ("Implement the plan") nó lưu
 kế hoạch vào `.claude/plans/<slug>.md` rồi thực thi bằng `parallel-execution`. Cơ chế này hoạt
 động ở dạng *gợi ý* (instructions nằm trong context). Nếu muốn **đảm bảo chắc chắn**, repo có
-sẵn ba hook (Claude Code) tại [`skills/senior-engineer/hooks/`](../skills/senior-engineer/hooks/):
+sẵn hai hook (Claude Code) tại [`skills/senior-engineer/hooks/`](../skills/senior-engineer/hooks/):
 
 - `plan_mode_prompt.py` — hook `UserPromptSubmit`: khi đang ở plan mode, nhắc agent dùng vòng
   đời `senior-engineer` (chỉ với task code/feature thực sự — task nhỏ/không phải code thì bỏ qua).
 - `plan_approved.py` — hook `PostToolUse` khớp `ExitPlanMode`: kích hoạt **đúng lúc bạn duyệt
   kế hoạch**, nhắc lưu kế hoạch vào `.claude/plans/` rồi chạy `parallel-execution` (chỉ với thay
   đổi nhiều phần — thay đổi nhỏ thì build thẳng).
-- `senior_engineer_explore_first.py` — hook `PostToolUse` khớp `Skill`: kích hoạt **đúng lúc
-  `senior-engineer` được gọi**, ép tool-call **tiếp theo bắt buộc** phải là `Skill(deep-exploration)`
-  (≥3 agent `Explore`) trước khi đọc file hay trả lời. Đây là cơ chế thực thi cho Step 0 — đóng
-  lỗ hổng khi agent chỉ *kể* là sẽ khám phá rồi tự `ls`/`grep` inline (và fan-out thiếu, ví dụ chỉ
-  2 agent) thay vì thật sự bàn giao.
 
-Hai hook plan-mode đều **judgment-preserving**: không bao giờ ép fan-out cho một thay đổi tầm
-thường. Ngược lại, `senior_engineer_explore_first.py` **cố ý không có ngoại lệ** — mỗi lần
-`senior-engineer` hoạt động là nó luôn ép khám phá trước (đúng theo Step 0 "ALWAYS, no exceptions").
-Để bật, thêm vào `~/.claude/settings.json` (đường dẫn theo bản cài mặc định của Claude Code):
+Cả hai đều **judgment-preserving**: không bao giờ ép fan-out cho một thay đổi tầm thường. Để bật,
+thêm vào `~/.claude/settings.json` (đường dẫn theo bản cài mặc định của Claude Code):
 
 ```json
 {
@@ -101,8 +94,7 @@ thường. Ngược lại, `senior_engineer_explore_first.py` **cố ý không c
       { "hooks": [ { "type": "command", "command": "python3 ~/.claude/skills/senior-engineer/hooks/plan_mode_prompt.py", "timeout": 10 } ] }
     ],
     "PostToolUse": [
-      { "matcher": "ExitPlanMode", "hooks": [ { "type": "command", "command": "python3 ~/.claude/skills/senior-engineer/hooks/plan_approved.py", "timeout": 10 } ] },
-      { "matcher": "Skill", "hooks": [ { "type": "command", "command": "python3 ~/.claude/skills/senior-engineer/hooks/senior_engineer_explore_first.py", "timeout": 10 } ] }
+      { "matcher": "ExitPlanMode", "hooks": [ { "type": "command", "command": "python3 ~/.claude/skills/senior-engineer/hooks/plan_approved.py", "timeout": 10 } ] }
     ]
   }
 }
@@ -111,8 +103,7 @@ thường. Ngược lại, `senior_engineer_explore_first.py` **cố ý không c
 > **Lưu ý — gộp, đừng ghi đè.** Nếu `settings.json` của bạn đã có khối `"hooks"` (ví dụ hook
 > âm thanh `Stop`/`Notification`), hãy **gộp** hai key `UserPromptSubmit` và `PostToolUse` ở trên
 > vào khối `hooks` hiện có — đừng dán đè cả khối, nếu không bạn sẽ xóa mất các hook đang có. Nếu
-> đã có sẵn `PostToolUse`, **thêm từng mục matcher** (`ExitPlanMode` và `Skill`) vào mảng thay vì
-> thay thế.
+> đã có sẵn `PostToolUse`, thêm một mục matcher `ExitPlanMode` vào mảng thay vì thay thế.
 
 > **Đường dẫn theo kiểu cài.** Snippet trên dùng đường dẫn của bản cài mặc định
 > (`~/.claude/skills/...`). Nếu bạn cài theo dự án (`./scripts/install.sh --project`), đổi thành
