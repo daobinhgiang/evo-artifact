@@ -1,7 +1,7 @@
 # Hướng dẫn sử dụng Evovi Agent Skills
 
 Cài đặt và sử dụng các agent skill trong repo này: **họ `senior-engineer`** (gồm `senior-engineer`
-và 6 skill chuyên biệt nó định tuyến tới) và **`ship`**. Tương thích với
+và 6 skill chuyên biệt nó định tuyến tới), **`ship`** và **`test`**. Tương thích với
 [Claude Code](https://claude.com/claude-code) và [Codex](https://developers.openai.com/codex)
 (cùng chuẩn `SKILL.md`). Chỉ dùng nội bộ Evovi — xem [README](../README.md).
 
@@ -10,6 +10,7 @@ và 6 skill chuyên biệt nó định tuyến tới) và **`ship`**. Tương th
 | **`senior-engineer`** | Persona kỹ sư cấp cao + bộ định tuyến. Định hình cách agent tư duy về kỹ thuật, cân nhắc khả năng mở rộng trong mọi quyết định backend/DB/schema, và định tuyến tới các skill chuyên biệt (review code, audit, refactor toàn app, khám phá sâu, plan→build). |
 | **Họ skill chuyên biệt** | `deep-exploration`, `parallel-execution`, `code-quality-review`, `codebase-review`, `codebase-wide-change`, `codex-triage` — các workflow mà `senior-engineer` định tuyến tới. Đi kèm và được cài cùng nhau. |
 | **`ship`** | Pipeline một lệnh: branch → commit → push → PR, kèm tùy chọn merge + deploy. Đọc `AGENTS.md` của từng repo, cắt nhánh mới từ `develop`/`staging`, không động vào `main`. |
+| **`test`** | QA tính năng trên trình duyệt thật qua nhiều Playwright MCP server song song (mỗi flow một subagent). Enumerate ca kiểm thử vào `TEST_MATRIX.md` rồi fan-out kiểm thử đồng thời. Cần thiết lập Playwright MCP (xem dưới). |
 
 ## Cài đặt
 
@@ -21,6 +22,7 @@ git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
 ./scripts/install.sh --claude    # chỉ Claude Code
 ./scripts/install.sh --codex     # chỉ Codex
 ./scripts/install.sh --project   # theo dự án
+./scripts/install.sh --playwright # kèm thiết lập Playwright MCP cho /test (mặc định 5; --playwright=7 cho 7)
 ```
 
 Hoặc copy thủ công — cả hai agent đều đọc chuẩn `SKILL.md`, chỉ khác đường dẫn:
@@ -32,6 +34,23 @@ cp -R skills/* ~/.agents/skills/   # Codex
 
 Kiểm tra: khởi động lại agent, rồi `/help` (Claude Code) hoặc `/skills` (Codex) để xác nhận
 cả hai skill được liệt kê.
+
+### Cập nhật
+
+`install.sh` tự thêm lệnh `evovi-skills` vào `~/.local/bin` và ghi nhớ phạm vi bạn đã chọn
+(Claude / Codex / cả hai). Cập nhật về sau giống `npm update`:
+
+```bash
+evovi-skills update     # kéo bản mới nhất từ GitHub rồi cài lại đúng phạm vi đã chọn lần trước
+evovi-skills            # cài lại theo phạm vi đã chọn
+evovi-skills --claude   # đổi phạm vi rồi cài lại
+```
+
+Cơ chế: mỗi lần cài/cập nhật, script `rm -rf` thư mục skill cũ rồi copy bản mới, nên không bao
+giờ còn file thừa. Khi gọi qua `evovi-skills` (hoặc `curl | bash`), nó tự `git clone --depth 1`
+bản mới nhất vào thư mục tạm. Nếu báo `command not found`, thêm
+`export PATH="$HOME/.local/bin:$PATH"` vào `~/.zshrc` rồi mở lại terminal — hoặc chạy lại lệnh
+`curl ... | bash` trong README.
 
 ### Tích hợp vào Codex
 
@@ -133,6 +152,34 @@ Các chế độ có thể kết hợp (`/ship here no pr`). `/ship` thích nghi
 nêu ra và đề nghị lưu vào `AGENTS.md`. Với repo Evovi, thả
 [`templates/AGENTS.evovi.md`](../templates/AGENTS.evovi.md) vào để nó biết luồng `develop` +
 dokploy ngay từ lần chạy đầu.
+
+## `test`
+
+Chạy `/test` để QA tính năng trên **trình duyệt thật**: skill enumerate ca kiểm thử vào
+`TEST_MATRIX.md` rồi giao mỗi flow cho một subagent, chạy đồng thời trên nhiều Playwright MCP
+server và tổng hợp báo cáo.
+
+| Lệnh | Hành vi |
+|---|---|
+| `/test` / `/test here` | chỉ kiểm thử thứ vừa thay đổi trong phiên này |
+| `/test all` | kiểm thử mọi flow trong `TEST_MATRIX.md` + các thay đổi phát hiện được |
+| `/test docs` | chỉ enumerate & cập nhật `TEST_MATRIX.md`, dừng trước khi mở trình duyệt |
+
+### Điều kiện: Playwright MCP (nhiều server song song)
+
+Skill cần **≥3 Playwright MCP server isolated** (`playwright`, `playwright2`, …) — mỗi server là một
+trình duyệt độc lập để chạy song song. Thiết lập nhanh qua installer:
+
+```bash
+./scripts/install.sh --playwright        # thêm 5 server (mặc định)
+./scripts/install.sh --playwright=7      # thêm 7 server
+```
+
+Installer dùng `claude mcp add --scope user <name> -- npx @playwright/mcp@latest --isolated` cho từng
+server (cần có `claude` CLI). Cờ `--isolated` cho mỗi server một profile riêng để không tranh khóa.
+**Sau khi thêm phải khởi động lại Claude Code** để kết nối server mới. Cấu hình thủ công hoặc tinh
+chỉnh (headless, số lượng, persisted login): xem
+[`skills/test/references/mcp-setup.md`](../skills/test/references/mcp-setup.md).
 
 ## Cập nhật & xử lý sự cố
 
