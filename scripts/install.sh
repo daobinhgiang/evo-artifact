@@ -4,10 +4,28 @@
 #   ./scripts/install.sh --claude   # chỉ Claude Code (~/.claude/skills)
 #   ./scripts/install.sh --codex    # chỉ Codex      (~/.agents/skills)
 #   ./scripts/install.sh --project  # theo dự án:    ./.claude/skills + ./.agents/skills
+#
+# Cài nhanh không cần clone (curl | bash) — xem README "Bắt đầu nhanh":
+#   curl -fsSL https://raw.githubusercontent.com/daobinhgiang/evo-artifact/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/daobinhgiang/evo-artifact/main/scripts/install.sh | bash -s -- --claude
 set -euo pipefail
 
-REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_URL="https://github.com/daobinhgiang/evo-artifact.git"
 SKILLS=(senior-engineer deep-exploration parallel-execution code-quality-review codebase-review codebase-wide-change codex-triage ship)
+
+# Nguồn skills: dùng checkout local nếu có; nếu chạy qua `curl | bash` thì tự clone vào thư mục tạm.
+REPO_DIR=""
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
+  maybe="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  [ -d "$maybe/skills" ] && REPO_DIR="$maybe"
+fi
+if [ -z "$REPO_DIR" ]; then
+  command -v git >/dev/null 2>&1 || { echo "Cần có 'git' để cài qua mạng."; exit 1; }
+  REPO_DIR="$(mktemp -d)"
+  trap 'rm -rf "$REPO_DIR"' EXIT
+  echo "Đang tải evo-artifact từ GitHub..."
+  git clone --depth 1 "$REPO_URL" "$REPO_DIR" >/dev/null 2>&1
+fi
 
 case "${1:-}" in
   --claude)  dests=("$HOME/.claude/skills") ;;

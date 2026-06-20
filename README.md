@@ -28,6 +28,18 @@ và [Codex](https://developers.openai.com/codex) (cùng chuẩn `SKILL.md`).
 
 ## Bắt đầu nhanh
 
+Cài một dòng, không cần clone (yêu cầu có `git`):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/daobinhgiang/evo-artifact/main/scripts/install.sh | bash                 # cả hai: ~/.claude/skills + ~/.agents/skills
+curl -fsSL https://raw.githubusercontent.com/daobinhgiang/evo-artifact/main/scripts/install.sh | bash -s -- --claude  # chỉ Claude Code
+curl -fsSL https://raw.githubusercontent.com/daobinhgiang/evo-artifact/main/scripts/install.sh | bash -s -- --codex   # chỉ Codex
+```
+
+Script tự tải repo về thư mục tạm rồi copy skills vào đích. Tham số đặt sau `bash -s --`.
+
+Hoặc clone rồi chạy (thêm `--project` để cài theo dự án vào `./.claude/skills` + `./.agents/skills`):
+
 ```bash
 git clone https://github.com/daobinhgiang/evo-artifact.git && cd evo-artifact
 ./scripts/install.sh             # cả hai: ~/.claude/skills + ~/.agents/skills
