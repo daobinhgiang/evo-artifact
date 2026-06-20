@@ -24,6 +24,26 @@ enumerate *every* case, story, and state that can happen to the target (Phase 1.
 are the one failure this skill exists to prevent. Then decompose aggressively, fan out widely, and
 prefer speed slightly over token cost. Always document before testing, and never run without a known target.
 
+## Prerequisite — Playwright MCP servers (the user must have these; ask Claude to set them up)
+
+This skill cannot run without **Playwright MCP servers**, and they are **not installed by default**.
+Surface this early — don't get halfway into a run and discover there's no browser to drive.
+
+- **If none are configured, the user needs to ask Claude to install them — and Claude does the install.**
+  This isn't something the user has to wire up by hand: when they say something like *"install the
+  Playwright MCP servers for /test"* (or you detect none in Phase 0), **you** add them per
+  `references/mcp-setup.md`, or point them at the repo's `install.sh --playwright`. Then they restart
+  Claude Code so the servers connect.
+- **Parallelism comes entirely from running multiple servers.** One Playwright MCP server = one browser
+  = one flow at a time, i.e. **no parallelism**. To test N flows simultaneously you must have **N
+  separate servers** configured (`playwright`, `playwright2`, `playwright3`, … — **minimum 3, no upper
+  limit**). If only one server exists, this skill is reduced to serial testing — so when you find fewer
+  servers than the run needs, **offer to add more before fanning out** (and if there are still fewer
+  servers than flows, run in waves sized to the server count).
+
+See `references/mcp-setup.md` for detection, the exact `--isolated` server config, and why separate
+servers (not tabs) are the only way to get true parallel sessions.
+
 ## Commands
 
 Parse the invocation argument first:

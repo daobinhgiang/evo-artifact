@@ -4,6 +4,12 @@ This skill drives several real browsers at once. Each browser comes from its **o
 server** — one MCP process = one browser, with its own serialized connection. To run N flows in
 parallel you need N servers, each pinned to one subagent.
 
+> **The user can simply ask Claude to set this up** — e.g. "install the Playwright MCP servers for
+> /test" — and Claude configures them using the steps below (or the repo's `install.sh --playwright`).
+> The user does not configure anything by hand. **One server gives zero parallelism**; to test flows
+> simultaneously, configure one server per concurrent flow (**minimum 3, no upper limit**). New servers
+> only connect after a Claude Code restart.
+
 ## Why multiple servers (not tabs / not subagents on one server)
 
 A single Playwright MCP server is **one browser, one connection, serialized**. Multiple tabs share
