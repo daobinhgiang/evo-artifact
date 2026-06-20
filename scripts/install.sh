@@ -52,24 +52,34 @@ LAUNCHER="$BIN_DIR/evovi-skills"
 CONFIG_DIR="$HOME/.config/evovi-skills"
 SCOPE_FILE="$CONFIG_DIR/scope"
 
-arg="${1:-}"
+# Phân tích MỌI tham số trong một vòng: scope đích (--claude/--codex/--project),
+# update/upgrade, và --playwright[=N]. (Gộp hai bộ parser cũ làm một để tránh xung đột.)
+scope=""            # "" = cả hai (mặc định)
+scope_set=false
+do_update=false
+pw_setup=false
+pw_count=5
+for a in "$@"; do
+  case "$a" in
+    update|upgrade)             do_update=true ;;
+    --claude|--codex|--project) scope="$a"; scope_set=true ;;
+    --playwright)               pw_setup=true ;;
+    --playwright=*)             pw_setup=true; pw_count="${a#*=}" ;;
+    *) echo "Tham số không hợp lệ: $a"; exit 1 ;;
+  esac
+done
 
-# `update` / `upgrade` = dùng lại phạm vi đã lưu từ lần cài trước.
-if [ "$arg" = "update" ] || [ "$arg" = "upgrade" ]; then
-  if [ -f "$SCOPE_FILE" ]; then
-    arg="$(cat "$SCOPE_FILE")"
-  else
-    arg=""   # chưa lưu phạm vi -> mặc định cả hai
-  fi
+# `update`/`upgrade` không kèm scope mới -> dùng phạm vi đã lưu từ lần cài trước.
+if [ "$do_update" = true ] && [ "$scope_set" = false ] && [ -f "$SCOPE_FILE" ]; then
+  scope="$(cat "$SCOPE_FILE")"
 fi
 
-# Resolve đích cài theo flag.
-case "$arg" in
-  --claude)  dests=("$HOME/.claude/skills");                                  scope="--claude" ;;
-  --codex)   dests=("$HOME/.agents/skills");                                  scope="--codex" ;;
-  --project) dests=("$(pwd)/.claude/skills" "$(pwd)/.agents/skills");         scope="--project" ;;
-  "")        dests=("$HOME/.claude/skills" "$HOME/.agents/skills");           scope="" ;;
-  *) echo "Tham số không hợp lệ: $arg"; exit 1 ;;
+# Resolve đích cài theo scope.
+case "$scope" in
+  --claude)  dests=("$HOME/.claude/skills") ;;
+  --codex)   dests=("$HOME/.agents/skills") ;;
+  --project) dests=("$(pwd)/.claude/skills" "$(pwd)/.agents/skills") ;;
+  "")        dests=("$HOME/.claude/skills" "$HOME/.agents/skills") ;;
 esac
 
 # Nguồn skills: dùng checkout local nếu có; nếu chạy qua `curl | bash` hoặc qua lệnh
@@ -86,26 +96,6 @@ if [ -z "$REPO_DIR" ]; then
   echo "Đang tải evo-artifact mới nhất từ GitHub..."
   git clone --depth 1 "$REPO_URL" "$REPO_DIR" >/dev/null 2>&1
 fi
-
-# Phân tích tham số: tách chế độ đích (--claude/--codex/--project) khỏi --playwright[=N].
-mode=""
-pw_setup=false
-pw_count=5
-for arg in "$@"; do
-  case "$arg" in
-    --claude|--codex|--project) mode="$arg" ;;
-    --playwright)   pw_setup=true ;;
-    --playwright=*) pw_setup=true; pw_count="${arg#*=}" ;;
-    *) echo "Tham số không hợp lệ: $arg"; exit 1 ;;
-  esac
-done
-
-case "$mode" in
-  --claude)  dests=("$HOME/.claude/skills") ;;
-  --codex)   dests=("$HOME/.agents/skills") ;;
-  --project) dests=("$(pwd)/.claude/skills" "$(pwd)/.agents/skills") ;;
-  "")        dests=("$HOME/.claude/skills" "$HOME/.agents/skills") ;;
-esac
 
 for dest in "${dests[@]}"; do
   mkdir -p "$dest"
