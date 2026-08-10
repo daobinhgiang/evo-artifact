@@ -181,6 +181,27 @@ server (cần có `claude` CLI). Cờ `--isolated` cho mỗi server một profil
 chỉnh (headless, số lượng, persisted login): xem
 [`skills/test/references/mcp-setup.md`](../skills/test/references/mcp-setup.md).
 
+## `product-onboarding-docs`
+
+Viết hoặc cập nhật tài liệu onboarding / hướng dẫn sử dụng cho **một vai trò cụ thể**
+(reviewer, quản lý, vận hành, admin…), kèm ảnh màn hình chụp từ app đang chạy.
+
+Kích hoạt bằng các yêu cầu dạng "viết hướng dẫn cho team QA", "cập nhật tài liệu cho khớp
+với app", "làm tài liệu onboarding cho vai trò quản lý".
+
+Nguyên tắc cốt lõi của skill:
+
+- **Không viết câu nào về giao diện mà chưa tự nhìn thấy trong app đang chạy.** Tài liệu cũ
+  chỉ là dàn ý khởi đầu, không phải nguồn chân lý.
+- **Giữ nguyên văn nhãn trên màn hình**, không diễn giải, không dịch — người dùng tìm chức
+  năng bằng cách khớp chữ.
+- **Vai trò thấy gì do UI quyết định, không phải API.** Chức năng vai trò đó không nhìn thấy
+  thì không nhắc tới trong tài liệu.
+- **Không nêu tên các mode/flag nội bộ.**
+
+Skill tự thích ứng với cơ chế chụp màn hình sẵn có: Playwright MCP (xem phần `test` ở trên),
+extension trình duyệt trong app, hoặc headless browser trong sandbox.
+
 ## Cập nhật & xử lý sự cố
 
 - **Cập nhật:** `git pull`, sau đó chạy lại `./scripts/install.sh`.
