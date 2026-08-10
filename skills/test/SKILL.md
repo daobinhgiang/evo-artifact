@@ -10,6 +10,7 @@ description: >-
   TEST_MATRIX.md of documented flows. NOT for unit/integration tests in code (that's a normal
   test runner) and NOT for a single quick check you can eyeball — this is for multi-flow,
   browser-driven verification fanned across parallel agents.
+version: 1.0.0
 ---
 
 # /test — Parallel browser-driven feature testing
