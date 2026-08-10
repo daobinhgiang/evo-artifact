@@ -18,6 +18,7 @@ và [Codex](https://developers.openai.com/codex) (cùng chuẩn `SKILL.md`).
 | ↳ [`codebase-wide-change`](skills/codebase-wide-change/SKILL.md) | Áp một thay đổi nhất quán trên toàn repo, không bỏ sót file nào. |
 | ↳ [`codex-triage`](skills/codex-triage/SKILL.md) | Phân loại comment review tự động của Codex trên PR: Fix Now / Fix Later / Dismiss. |
 | [`ship`](skills/ship/SKILL.md) | Pipeline một lệnh: branch → commit → push → PR, kèm tùy chọn merge + deploy. Mặc định theo luồng nhánh `develop` của Evovi và không bao giờ động vào `main`. |
+| [`product-onboarding-docs`](skills/product-onboarding-docs/SKILL.md) | Viết/cập nhật tài liệu onboarding & hướng dẫn sử dụng theo từng vai trò (reviewer, quản lý, vận hành…), có chụp ảnh màn hình đã kiểm chứng trên app đang chạy. Chỉ viết những gì nhìn thấy thật trong app. |
 | [`test`](skills/test/SKILL.md) | QA tính năng trên trình duyệt thật: chạy nhiều Playwright MCP server song song, mỗi flow một subagent. Enumerate ca kiểm thử vào `TEST_MATRIX.md`, fan-out kiểm thử đồng thời rồi tổng hợp báo cáo. Cần Playwright MCP — `install.sh --playwright` thiết lập sẵn. |
 
 > Sáu skill có dấu **↳** là *họ skill* mà `senior-engineer` định tuyến tới. `senior-engineer`
@@ -91,6 +92,7 @@ skills/
   codebase-wide-change/SKILL.md # thay đổi nhất quán toàn repo
   codex-triage/SKILL.md        # phân loại review của Codex
   ship/SKILL.md                # pipeline ship
+  product-onboarding-docs/     # tài liệu onboarding theo vai trò + references/
   test/SKILL.md                # QA trình duyệt song song (Playwright MCP)
 docs/USAGE.md                  # hướng dẫn sử dụng
 templates/AGENTS.evovi.md      # AGENTS.md mẫu cho repo Evovi
